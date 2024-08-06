@@ -21,7 +21,7 @@ import SignUpForm from "./pages/SignUpForm";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Homepage />,
+    element: <MainLogin />,
     errorElement: <ErrorPage />
   },
   {
