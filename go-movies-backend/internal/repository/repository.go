@@ -18,5 +18,7 @@ type DatabaseRepo interface {
 	UpdateMovieGenres(id int, genreIDs []int) error 
 	UpdateMovie(movie models.Movie) error
 	DeleteMovieByID(id int) error
+	CheckUserByEmail (email string) (bool , error)
+	CreatUser(user *models.User) (error) 
 
 }

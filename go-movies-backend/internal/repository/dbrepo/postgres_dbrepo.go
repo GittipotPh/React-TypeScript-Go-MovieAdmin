@@ -3,6 +3,7 @@ package dbrepo
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -164,6 +165,52 @@ func (m *PostgresDBRepo) GetUserByEmail(email string) (*models.User , error) {
 	}
 
 	return &user , nil
+}
+
+func (m *PostgresDBRepo) CreatUser(user *models.User) (error) {
+	ctx , cancle := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancle()
+
+
+	query := `insert into users (first_name, last_name, email, password, created_at, updated_at) 
+	values($1, $2, $3, $4, $5, $6)`
+
+	_ ,err := m.DB.ExecContext(ctx , query,	
+		user.FirstName,
+		user.LastName,
+		user.Email,
+		user.Password,
+		time.Now(),
+		time.Now(),)
+
+
+	if err != nil {
+		return  err
+	}
+
+	return nil
+}
+
+func (m *PostgresDBRepo) CheckUserByEmail (email string) (bool , error) {
+	ctx , cancle := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancle()
+
+	query := `select id from users where email = $1`
+
+	var id int
+
+	err := m.DB.QueryRowContext(ctx, query, email).Scan(&id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return true, nil
+		}
+		return false , err
+	}
+		
+
+	
+
+	return false , errors.New("user already exists")
 }
 
 func (m *PostgresDBRepo) GetUserById (id int) (*models.User , error) {

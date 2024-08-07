@@ -1,6 +1,7 @@
 import { Form } from "react-router-dom";
 import Input3 from "../components/Input3";
 import { useForm } from "react-hook-form";
+import { useAuth } from "../contexts/AuthContext/useAuth";
 
 type UserSignup = {
   firstName: string;
@@ -10,7 +11,7 @@ type UserSignup = {
 };
 
 export default function SignUpForm() {
-  // const { jwtToken } = useAuth();
+  const { jwtToken } = useAuth();
   const {
     register,
     formState: { errors }, // Correctly destructuring errors from formState
@@ -26,7 +27,7 @@ export default function SignUpForm() {
   }: UserSignup) {
     const header = new Headers();
     header.append("Content-Type", "application/json");
-    // header.append("Authorization", "Bearer " + jwtToken);
+    header.append("Authorization", "Bearer " + jwtToken);
 
     const requestOptions = {
       method: "POST",
@@ -57,7 +58,7 @@ export default function SignUpForm() {
         id="firstName"
         placeholder="enter Firstname..."
         labelName="First Name"
-        errorMsg={errors.firstName?.message as string} // Accessing the error message as string correctly
+        errorMsg={errors.firstName?.message as string}
         type="text"
         {...register("firstName", {
           required: "This field is required"
@@ -67,7 +68,7 @@ export default function SignUpForm() {
         id="lastName"
         placeholder="enter Lastname..."
         labelName="Last Name"
-        errorMsg={errors.lastName?.message as string} // Accessing the error message as string correctly
+        errorMsg={errors.lastName?.message as string}
         type="text"
         {...register("lastName", {
           required: "This field is required"
@@ -77,7 +78,7 @@ export default function SignUpForm() {
         id="email"
         placeholder="enter email..."
         labelName="Email"
-        errorMsg={errors.email?.message as string} // Accessing the error message as string correctly
+        errorMsg={errors.email?.message as string}
         type="email"
         {...register("email", {
           required: "This field is required"
@@ -88,7 +89,7 @@ export default function SignUpForm() {
         placeholder="enter password..."
         labelName="Password"
         type="password"
-        errorMsg={errors.password?.message as string} // Accessing the error message as string correctly
+        errorMsg={errors.password?.message as string}
         {...register("password", {
           required: "This field is required",
           minLength: {

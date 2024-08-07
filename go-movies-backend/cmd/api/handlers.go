@@ -498,3 +498,43 @@ func (app *application) AllMoviesByGenre(w http.ResponseWriter, r *http.Request)
 
 	app.writeJSON(w, http.StatusOK, movies)
 }
+
+func (app *application) UserRegister(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+
+	err := app.readJSON(w, r , &user)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	_ , err = app.DB.CheckUserByEmail(user.Email)
+
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	
+	hashPW , err := user.HashedPassword(user.Password)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	user.Password = hashPW
+
+	err = app.DB.CreatUser(&user)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	res := JSONResponse{
+		Error: false,
+		Message: "Success Created USER",
+	}
+
+	app.writeJSON(w, http.StatusAccepted, res)
+	
+}
