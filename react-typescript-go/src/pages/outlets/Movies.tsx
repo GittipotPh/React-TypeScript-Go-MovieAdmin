@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import ButtonLinkMovie from "../../components/ButtonLinkMovie";
 import { MovieType } from "./Movie";
+import { useNavigate } from "react-router-dom";
 
 const StyleLeftApp = styled.div`
   background-color: var(--color-grey-200);
@@ -116,6 +117,7 @@ export default function MovieLeftApp() {
   const [movies, setMovies] = useState<MovieType[]>([]);
   const [search, setSearch] = useState<string>("");
   const [searchedMovie, setSearchedMovie] = useState<MovieType[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (search.length < 3) return;
@@ -144,13 +146,19 @@ export default function MovieLeftApp() {
         const movies: MovieType[] = await res.json();
         console.log(movies);
         setMovies(movies);
+
+        const randomMovie = Math.round(Math.random() + 1) * movies.length;
+
+        setTimeout(() => {
+          navigate(`/app/movies/${randomMovie}`, { replace: true });
+        }, 500);
       } catch (err) {
         console.log(err);
       }
     }
 
     fetchMovies();
-  }, []);
+  }, [navigate]);
 
   return (
     <StyleLeftApp>

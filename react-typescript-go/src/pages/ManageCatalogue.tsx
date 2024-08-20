@@ -77,6 +77,19 @@ const StyleCatalogue = styled.div`
     th {
       background-color: var(--color-grey-100);
     }
+    th:nth-child(1) {
+      width: 15%;
+    }
+    th:nth-child(3) {
+      width: 5%;
+    }
+    th:nth-child(2) {
+      width: 15%;
+    }
+    th:nth-child(4) {
+      width: 10%;
+      text-align: center;
+    }
 
     tr:nth-child(even) {
       background-color: var(--color-grey-200);
@@ -144,6 +157,7 @@ export default function ManageCatalogue() {
 
   useEffect(() => {
     async function fetchMovies() {
+      console.log("JWTOKEN fetch catalogue", jwtToken);
       if (jwtToken === "") {
         navigate("/login");
         return;

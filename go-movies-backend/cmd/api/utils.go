@@ -45,7 +45,7 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data interf
 }
 
 func (app *application) readJSON(w http.ResponseWriter, r *http.Request , data interface{}) error {
-	maxBytes := 1024 * 1024 // one megabyte
+	maxBytes := 1024 * 1024 
 	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 
 	dec := json.NewDecoder(r.Body)
@@ -54,7 +54,7 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request , data i
 
 	err := dec.Decode(data)
     if err != nil {
-        // Detailed error logging
+      
         if syntaxErr, ok := err.(*json.SyntaxError); ok {
             return fmt.Errorf("JSON syntax error at byte offset %d: %v", syntaxErr.Offset, err)
         }

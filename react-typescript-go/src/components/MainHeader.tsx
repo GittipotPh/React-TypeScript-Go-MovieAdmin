@@ -34,17 +34,14 @@ export default function MainHeader() {
       };
 
       try {
-        await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/logout`,
-          requestOptions
-        );
-
-        navigate("/login");
+        await fetch(`http://localhost:8080/logout`, requestOptions);
+        localStorage.removeItem("jwt_token");
+        setJwtToken("");
+        toggleRefresh(false);
       } catch (error) {
         console.error("Logout failed:", error);
       } finally {
-        setJwtToken("");
-        toggleRefresh(false);
+        navigate("/login");
       }
     }
   }

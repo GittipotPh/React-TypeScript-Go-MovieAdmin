@@ -74,7 +74,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  const { toggleRefresh } = useAuth();
+  const { toggleRefresh, setJwtToken } = useAuth();
 
   useEffect(() => {
     if (showSuccess) {
@@ -114,11 +114,14 @@ export default function Login() {
         } else {
           setMessage("Successfully authenticated");
           setShowSuccess("true");
+
+          localStorage.setItem("jwt_token", data.access_token);
+          setJwtToken(data.access_token);
           toggleRefresh(true);
 
           setTimeout(() => {
-            navigate("/app");
-          }, 3000);
+            navigate("/app/admin/movies/0");
+          }, 2000);
         }
       })
       .catch((error) => {

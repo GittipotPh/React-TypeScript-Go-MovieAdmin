@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 
 type AuthProviderProps = {
@@ -6,46 +6,52 @@ type AuthProviderProps = {
 };
 
 function AuthProvider({ children }: AuthProviderProps) {
-  const [jwtToken, setJwtToken] = useState<string>("");
+  const token = localStorage.getItem("jwt_token");
+
+  const [jwtToken, setJwtToken] = useState<string>(token ? token : "");
   const [ticking, setTicking] = useState<boolean>(false);
-  const tickIntervalRef = useRef<number | undefined>(undefined);
+  const [tickIntervalId, setTickIntervalId] = useState<number | null>(null);
 
-  const toggleRefresh = useCallback((status: boolean) => {
-    console.log("clicked");
-    setTicking(status);
+  const toggleRefresh = useCallback(
+    (status: boolean) => {
+      console.log("clicked");
+      setTicking(status);
 
-    if (ticking) {
-      console.log("turning on ticking");
-      const i = window.setInterval(() => {
-        const requestOptions = {
-          method: "GET",
-          credentials: "include" as RequestCredentials
-        };
-        fetch("http://localhost:8080/refresh", requestOptions)
-          .then((response) => response.json())
-          .then((data) => {
-            console.log(data);
-            console.log(data.access_token);
-            if (data.access_token) {
-              setJwtToken(data.access_token);
-            }
-          })
-          .catch((error) => {
-            console.log("user is not logged in", error);
-          });
-      }, 600000);
+      if (ticking) {
+        console.log("turning on ticking");
+        const intervalId = window.setInterval(() => {
+          const requestOptions = {
+            method: "GET",
+            credentials: "include" as RequestCredentials
+          };
+          fetch("http://localhost:8080/refresh", requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              console.log(data.access_token);
+              if (data.access_token) {
+                localStorage.setItem("jwt_token", data.access_token);
+                setJwtToken(data.access_token);
+              }
+            })
+            .catch((error) => {
+              console.log("user is not logged in", error);
+            });
+        }, 600000);
 
-      tickIntervalRef.current = i;
-      console.log("setting tick interval to", i);
-    } else {
-      console.log("turning off ticking");
-      console.log("turning off interval", tickIntervalRef.current);
-      if (tickIntervalRef.current !== undefined) {
-        clearInterval(tickIntervalRef.current);
-        tickIntervalRef.current = undefined;
+        setTickIntervalId(intervalId);
+        console.log("setting tick interval to", intervalId);
+      } else {
+        console.log("turning off ticking");
+        if (tickIntervalId !== null) {
+          console.log("clearing interval", tickIntervalId);
+          clearInterval(tickIntervalId);
+          setTickIntervalId(null);
+        }
       }
-    }
-  }, []);
+    },
+    [tickIntervalId]
+  );
 
   useEffect(() => {
     if (jwtToken === "") {
@@ -56,9 +62,10 @@ function AuthProvider({ children }: AuthProviderProps) {
       fetch("http://localhost:8080/refresh", requestOptions)
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           console.log(data.access_token);
           if (data.access_token) {
+            localStorage.setItem("jwt_token", data.access_token);
+
             setJwtToken(data.access_token);
             toggleRefresh(true);
           }

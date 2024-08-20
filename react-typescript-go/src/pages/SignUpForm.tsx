@@ -34,7 +34,7 @@ export default function SignUpForm() {
       headers: header,
       credential: "include" as RequestCredentials,
       body: JSON.stringify({
-        full_name: firstName,
+        first_name: firstName,
         last_name: lastName,
         password: password,
         email: email
